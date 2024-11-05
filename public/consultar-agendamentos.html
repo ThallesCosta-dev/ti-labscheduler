@@ -70,28 +70,37 @@
 <script>
     async function loadAgendamentos() {
         try {
-            const response = await fetch('/api/schedulings', {
+            const response = await fetch('/api/schedulings/my', {
                 headers: auth.getHeaders()
             });
             
+            if (!response.ok) {
+                throw new Error('Erro ao carregar agendamentos');
+            }
+
             const agendamentos = await response.json();
             
             const agendamentosContainer = document.getElementById('agendamentosContainer');
             const noAgendamentosMessage = document.getElementById('noAgendamentosMessage');
             
+            agendamentosContainer.innerHTML = ''; // Limpa o container
+
             if (agendamentos.length === 0) {
                 noAgendamentosMessage.style.display = 'block';
             } else {
+                noAgendamentosMessage.style.display = 'none';
                 agendamentos.forEach(agendamento => {
                     const agendamentoCard = document.createElement('div');
                     agendamentoCard.className = 'agendamento-card fade-in';
                     agendamentoCard.innerHTML = `
                         <h5>${agendamento.laboratory}</h5>
                         <p><strong>Data:</strong> ${formatDate(agendamento.date)}</p>
-                        <p><strong>Hora:</strong> ${agendamento.time}</p>
-                        <p><strong>Duração:</strong> ${agendamento.duration} horas</p>
-                        <p><strong>Computadores:</strong> ${agendamento.computerNumber}</p>
-                        <p><strong>Turno:</strong> ${obterTurno(agendamento.time)}</p>
+                        <p><strong>Horário:</strong> ${agendamento.time_start} - ${agendamento.time_end}</p>
+                        <p><strong>Computadores:</strong> ${agendamento.computer_number}</p>
+                        <p><strong>Encarregado:</strong> ${agendamento.supervisor}</p>
+                        <p><strong>Responsável:</strong> ${agendamento.responsible}</p>
+                        <p><strong>Qtd. Alunos:</strong> ${agendamento.student_count}</p>
+                        <p><strong>Programas:</strong> ${agendamento.required_programs}</p>
                     `;
                     agendamentosContainer.appendChild(agendamentoCard);
                 });

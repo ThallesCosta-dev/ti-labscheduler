@@ -20,10 +20,15 @@ router.post('/', auth, async (req, res) => {
     }
 });
 
-// Listar agendamentos do usuário
+// Listar agendamentos (com verificação de role)
 router.get('/my', auth, async (req, res) => {
     try {
-        const schedulings = await Scheduling.getByUserId(req.user.id);
+        let schedulings;
+        if (req.user.role === 'admin') {
+            schedulings = await Scheduling.getAll();
+        } else {
+            schedulings = await Scheduling.getByUserId(req.user.id);
+        }
         res.json(schedulings);
     } catch (error) {
         res.status(500).json({ message: error.message });
