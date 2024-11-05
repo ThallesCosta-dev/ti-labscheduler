@@ -129,27 +129,45 @@
             </select>
         </div>
 
-        <div class="row justify-content-center" id="seatsContainer">
-            <!-- Os ícones de assentos serão gerados aqui -->
+        <!-- Novos campos -->
+        <div class="mb-4">
+            <label for="encarregado" class="form-label">Encarregado do Setor:</label>
+            <input type="text" class="form-control" id="encarregado" required>
         </div>
 
-        <!-- Campos de Agendamento -->
         <div class="mb-4">
-            <label for="data" class="form-label">Data:</label>
+            <label for="responsavel" class="form-label">Responsável pela Utilização:</label>
+            <input type="text" class="form-control" id="responsavel" required>
+        </div>
+
+        <div class="mb-4">
+            <label for="qtdAlunos" class="form-label">Quantidade de Alunos:</label>
+            <input type="number" class="form-control" id="qtdAlunos" min="1" required>
+        </div>
+
+        <div class="mb-4">
+            <label for="programas" class="form-label">Programas Necessários:</label>
+            <textarea class="form-control" id="programas" rows="3" placeholder="Liste os programas necessários" required></textarea>
+        </div>
+
+        <div class="mb-4">
+            <label for="data" class="form-label">Data de Utilização:</label>
             <input type="date" class="form-control" id="data" required>
         </div>
-        <div class="mb-4">
-            <label for="hora" class="form-label">Horário:</label>
-            <input type="time" class="form-control" id="hora" required>
+
+        <div class="row">
+            <div class="col-md-6 mb-4">
+                <label for="horaInicio" class="form-label">Horário de Início:</label>
+                <input type="time" class="form-control" id="horaInicio" required>
+            </div>
+            <div class="col-md-6 mb-4">
+                <label for="horaFim" class="form-label">Horário de Término:</label>
+                <input type="time" class="form-control" id="horaFim" required>
+            </div>
         </div>
-        <div class="mb-4">
-            <label for="duracao" class="form-label">Duração:</label>
-            <select class="form-select" id="duracao" required>
-                <option value="1">1 hora</option>
-                <option value="2">2 horas</option>
-                <option value="3">3 horas</option>
-                <option value="4">4 horas</option>
-            </select>
+
+        <div class="row justify-content-center" id="seatsContainer">
+            <!-- Os ícones de assentos serão gerados aqui -->
         </div>
 
         <button id="agendarButton" class="btn btn-primary mb-4">Agendar</button>
@@ -212,13 +230,18 @@
 
     agendarButton.addEventListener('click', async () => {
         const data = document.getElementById('data').value;
-        const hora = document.getElementById('hora').value;
-        const duracao = document.getElementById('duracao').value;
+        const horaInicio = document.getElementById('horaInicio').value;
+        const horaFim = document.getElementById('horaFim').value;
         const laboratorio = laboratorioSelect.value;
+        const encarregado = document.getElementById('encarregado').value;
+        const responsavel = document.getElementById('responsavel').value;
+        const qtdAlunos = document.getElementById('qtdAlunos').value;
+        const programas = document.getElementById('programas').value;
         const computadores = Array.from(document.querySelectorAll('.seat.selected'))
             .map(seat => seat.id);
 
-        if (!data || !hora || !duracao || !laboratorio || computadores.length === 0) {
+        if (!data || !horaInicio || !horaFim || !laboratorio || !encarregado || 
+            !responsavel || !qtdAlunos || !programas || computadores.length === 0) {
             alert('Por favor, preencha todos os campos e selecione pelo menos um computador.');
             return;
         }
@@ -231,8 +254,12 @@
                     laboratory: laboratorio,
                     computerNumber: computadores.join(','),
                     date: data,
-                    time: hora,
-                    duration: parseInt(duracao)
+                    timeStart: horaInicio,
+                    timeEnd: horaFim,
+                    supervisor: encarregado,
+                    responsible: responsavel,
+                    studentCount: parseInt(qtdAlunos),
+                    requiredPrograms: programas
                 })
             });
 

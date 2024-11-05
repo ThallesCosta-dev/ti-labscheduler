@@ -3,8 +3,19 @@ const pool = require('../config/database');
 const schedulingController = {
     async create(req, res) {
         try {
-            const { laboratory, computerNumber, date, time, duration } = req.body;
-            const userId = req.user.id; // Obtido do middleware de autenticação
+            const { 
+                laboratory, 
+                computerNumber, 
+                date, 
+                timeStart, 
+                timeEnd,
+                supervisor,
+                responsible,
+                studentCount,
+                requiredPrograms 
+            } = req.body;
+            
+            const userId = req.user.id;
 
             // Verificar sobreposição de horários
             const [existingSchedulings] = await pool.execute(
@@ -12,9 +23,9 @@ const schedulingController = {
                 WHERE laboratory = ? 
                 AND computer_number = ? 
                 AND date = ? 
-                AND ((time <= ? AND ADDTIME(time, SEC_TO_TIME(duration * 3600)) > ?) 
-                OR (time < ADDTIME(?, SEC_TO_TIME(? * 3600)) AND time >= ?))`,
-                [laboratory, computerNumber, date, time, time, time, duration, time]
+                AND ((time_start <= ? AND time_end > ?) 
+                OR (time_start < ? AND time_end >= ?))`,
+                [laboratory, computerNumber, date, timeEnd, timeStart, timeEnd, timeStart]
             );
 
             if (existingSchedulings.length > 0) {
@@ -22,8 +33,30 @@ const schedulingController = {
             }
 
             const [result] = await pool.execute(
-                'INSERT INTO schedulings (user_id, laboratory, computer_number, date, time, duration) VALUES (?, ?, ?, ?, ?, ?)',
-                [userId, laboratory, computerNumber, date, time, duration]
+                `INSERT INTO schedulings (
+                    user_id, 
+                    laboratory, 
+                    computer_number, 
+                    date, 
+                    time_start,
+                    time_end,
+                    supervisor,
+                    responsible,
+                    student_count,
+                    required_programs
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                [
+                    userId, 
+                    laboratory, 
+                    computerNumber, 
+                    date, 
+                    timeStart,
+                    timeEnd,
+                    supervisor,
+                    responsible,
+                    studentCount,
+                    requiredPrograms
+                ]
             );
 
             res.status(201).json({ message: 'Agendamento criado com sucesso' });
