@@ -29,11 +29,12 @@ O TI LabScheduler é um aplicativo web desenvolvido para gerenciar agendamentos 
 3. Instale as dependências do backend:
    ```bash
    npm install
+   npm install express cors dotenv mysql2 jsonwebtoken bcrypt path
    ```
 4. Configure o banco de dados MySQL e crie as tabelas necessárias conforme descrito na documentação.
 5. Inicie o servidor:
    ```bash
-   node server.js
+   node src/server.js
    ```
 6. Abra o navegador e acesse `http://localhost:3000`(Não temos ainda site :/).
 
