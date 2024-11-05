@@ -15,19 +15,22 @@ class Scheduling {
             requiredPrograms 
         } = schedulingData;
 
-        // Verificar disponibilidade
-        const [existing] = await pool.execute(
-            `SELECT * FROM schedulings 
-            WHERE laboratory = ? 
-            AND computer_number = ? 
-            AND date = ? 
-            AND ((time_start <= ? AND time_end > ?) 
-            OR (time_start < ? AND time_end >= ?))`,
-            [laboratory, computerNumber, date, timeEnd, timeStart, timeEnd, timeStart]
-        );
+        // Verificar disponibilidade para cada computador
+        const computadores = computerNumber.split(',');
+        for (const comp of computadores) {
+            const [existing] = await pool.execute(
+                `SELECT * FROM schedulings 
+                WHERE laboratory = ? 
+                AND computer_number LIKE ? 
+                AND date = ? 
+                AND ((time_start <= ? AND time_end > ?) 
+                OR (time_start < ? AND time_end >= ?))`,
+                [laboratory, `%${comp}%`, date, timeEnd, timeStart, timeEnd, timeStart]
+            );
 
-        if (existing.length > 0) {
-            throw new Error('Horário já agendado');
+            if (existing.length > 0) {
+                throw new Error(`Computador ${comp} já está agendado para este horário`);
+            }
         }
 
         const [result] = await pool.execute(
@@ -62,11 +65,15 @@ class Scheduling {
 
     static async getByUserId(userId) {
         const [schedulings] = await pool.execute(
-            `SELECT s.*, u.name as user_name 
+            `SELECT s.*, u.name as user_name,
+            (SELECT COUNT(*) FROM schedulings 
+             WHERE computer_number = s.computer_number 
+             AND date = s.date 
+             AND time_start = s.time_start) as computer_count
             FROM schedulings s 
             JOIN users u ON s.user_id = u.id 
             WHERE s.user_id = ?
-            ORDER BY s.date, s.time_start`,
+            ORDER BY s.date DESC, s.time_start ASC`,
             [userId]
         );
         return schedulings;
@@ -74,10 +81,14 @@ class Scheduling {
 
     static async getAll() {
         const [schedulings] = await pool.execute(
-            `SELECT s.*, u.name as user_name 
+            `SELECT s.*, u.name as user_name,
+            (SELECT COUNT(*) FROM schedulings 
+             WHERE computer_number = s.computer_number 
+             AND date = s.date 
+             AND time_start = s.time_start) as computer_count
             FROM schedulings s 
             JOIN users u ON s.user_id = u.id 
-            ORDER BY s.date, s.time_start`
+            ORDER BY s.date DESC, s.time_start ASC`
         );
         return schedulings;
     }

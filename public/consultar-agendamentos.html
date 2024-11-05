@@ -23,8 +23,8 @@
 
         .agendamento-card {
             background: rgba(255, 255, 255, 0.9);
-            border-radius: 15px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             backdrop-filter: blur(10px);
             transition: all 0.3s ease;
             padding: 1.5rem;
@@ -43,6 +43,25 @@
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(-20px); }
             to { opacity: 1; transform: translateY(0); }
+        }
+
+        .badge {
+            padding: 0.5em 1em;
+            font-size: 0.875em;
+            border-radius: 4px;
+        }
+
+        .bg-success {
+            background-color: #28a745 !important;
+        }
+
+        .bg-warning {
+            background-color: #ffc107 !important;
+            color: #000 !important;
+        }
+
+        .dark-mode .badge {
+            opacity: 0.9;
         }
     </style>
 </head>
@@ -68,6 +87,12 @@
 <script src="/js/auth.js"></script>
 
 <script>
+    function formatComputadores(computerString) {
+        if (!computerString) return 'Nenhum';
+        const computadores = computerString.split(',');
+        return `${computadores.length} computador(es): ${computadores.join(', ')}`;
+    }
+
     async function loadAgendamentos() {
         try {
             const response = await fetch('/api/schedulings/my', {
@@ -83,7 +108,7 @@
             const agendamentosContainer = document.getElementById('agendamentosContainer');
             const noAgendamentosMessage = document.getElementById('noAgendamentosMessage');
             
-            agendamentosContainer.innerHTML = ''; // Limpa o container
+            agendamentosContainer.innerHTML = '';
 
             if (agendamentos.length === 0) {
                 noAgendamentosMessage.style.display = 'block';
@@ -93,10 +118,13 @@
                     const agendamentoCard = document.createElement('div');
                     agendamentoCard.className = 'agendamento-card fade-in';
                     agendamentoCard.innerHTML = `
-                        <h5>${agendamento.laboratory}</h5>
+                        <div class="d-flex justify-content-between align-items-start">
+                            <h5>${agendamento.laboratory}</h5>
+                            ${getAgendamentoStatus(agendamento.date, agendamento.time_start, agendamento.time_end)}
+                        </div>
                         <p><strong>Data:</strong> ${formatDate(agendamento.date)}</p>
                         <p><strong>Horário:</strong> ${agendamento.time_start} - ${agendamento.time_end}</p>
-                        <p><strong>Computadores:</strong> ${agendamento.computer_number}</p>
+                        <p><strong>Computadores:</strong> ${formatComputadores(agendamento.computer_number)}</p>
                         <p><strong>Encarregado:</strong> ${agendamento.supervisor}</p>
                         <p><strong>Responsável:</strong> ${agendamento.responsible}</p>
                         <p><strong>Qtd. Alunos:</strong> ${agendamento.student_count}</p>
@@ -156,6 +184,19 @@
             return;
         }
     });
+
+    function getAgendamentoStatus(date, timeStart, timeEnd) {
+        const now = new Date();
+        const agendamentoDateTime = new Date(`${date}T${timeStart}`);
+        const agendamentoEndDateTime = new Date(`${date}T${timeEnd}`);
+        
+        if (now >= agendamentoDateTime && now <= agendamentoEndDateTime) {
+            return '<span class="badge bg-success">Em andamento</span>';
+        } else if ((agendamentoDateTime - now) <= 3600000 && (agendamentoDateTime - now) > 0) {
+            return '<span class="badge bg-warning">Em breve</span>';
+        }
+        return '';
+    }
 </script>
 
 </body>
