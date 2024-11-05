@@ -36,7 +36,7 @@ O TI LabScheduler é um aplicativo web desenvolvido para gerenciar agendamentos 
    ```bash
    node src/server.js
    ```
-6. Abra o navegador e acesse `http://localhost:3000`(Não temos ainda site :/).
+6. Abra o navegador e acesse `http://localhost:3000`(Não temos ainda site 😔).
 
 ## Uso
 - Acesse a página de login para entrar no sistema.
