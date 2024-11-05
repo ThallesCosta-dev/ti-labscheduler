@@ -60,20 +60,30 @@
         }
 
         .seat {
-            font-size: 2rem; /* Tamanho do ícone */
-            color: #797979; /* Cor do ícone */
-            background: transparent; /* Fundo transparente */
-            border: none; /* Sem borda */
-            cursor: pointer; /* Cursor de ponteiro */
-            transition: color 0.2s, transform 0.2s; /* Efeito de transição */
-            display: flex; /* Flexbox para centralizar */
-            justify-content: center; /* Centraliza horizontalmente */
-            align-items: center; /* Centraliza verticalmente */
+            width: 40px;
+            height: 40px;
+            margin: 5px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            transition: all 0.3s ease;
         }
 
-        .seat.selected {
-            color: #007bff; /* Cor quando selecionado */
-            transform: scale(1.1); /* Aumenta o tamanho quando selecionado */
+        .seat i {
+            font-size: 1.5em;
+            color: #6c757d;
+        }
+
+        .seat.selected i {
+            color: #0b5ed7;
+        }
+
+        .dark-mode .seat i {
+            color: #adb5bd;
+        }
+
+        .dark-mode .seat.selected i {
+            color: #0b5ed7;
         }
 
         .confirmation-message {
@@ -194,30 +204,35 @@
     const confirmationMessage = document.getElementById('confirmationMessage');
     const backButton = document.getElementById('backButton');
 
+    function createComputerLabel(number) {
+        const label = document.createElement('div');
+        label.className = 'text-center mt-1 small';
+        label.textContent = `CPU${number}`;
+        return label;
+    }
+
     laboratorioSelect.addEventListener('change', () => {
-        // Limpa os assentos anteriores
         seatsContainer.innerHTML = '';
 
-        // Obtém a capacidade do laboratório selecionado
         const selectedOption = laboratorioSelect.options[laboratorioSelect.selectedIndex];
         const capacidade = selectedOption.getAttribute('data-capacidade');
 
-        // Gera os ícones de assentos de acordo com a capacidade
         for (let i = 1; i <= capacidade; i++) {
             const colDiv = document.createElement('div');
-            colDiv.className = 'col-2';
+            colDiv.className = 'col-2 mb-3';
+
             const seatIcon = document.createElement('button');
             seatIcon.className = 'seat';
-            seatIcon.id = 'comp' + i;
-            seatIcon.innerHTML = '<i class="fas fa-desktop"></i>'; // Ícone de computador
+            seatIcon.id = `CPU${i}`;
+            seatIcon.innerHTML = '<i class="fas fa-desktop"></i>';
 
-            // Adiciona evento para selecionar o assento
             seatIcon.addEventListener('click', () => {
                 seatIcon.classList.toggle('selected');
                 updateSelectedSeats();
             });
 
             colDiv.appendChild(seatIcon);
+            colDiv.appendChild(createComputerLabel(i));
             seatsContainer.appendChild(colDiv);
         }
     });
