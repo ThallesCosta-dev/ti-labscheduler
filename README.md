@@ -50,4 +50,4 @@ Este projeto foi desenvolvido pelo Grupo 1 (Thalles, Isabela, Raul e Philipi) pa
 
 
 ## Contato
-Para mais informações, entre em contato com esse [Email](thalles.24104708360068@faeterj-rio.edu.br](mailto:thalles.24104708360068@faeterj-rio.edu.br).
+Para mais informações, entre em contato com esse [Email](mailto:thalles.24104708360068@faeterj-rio.edu.br).
