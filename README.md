@@ -45,7 +45,8 @@ O TI LabScheduler é um aplicativo web desenvolvido para gerenciar agendamentos 
 ## Contribuição
 Contribuições são bem-vindas! Sinta-se à vontade para abrir issues ou pull requests.
 
-Este projeto foi desenvolvido pela turma 2CAW da FAETERJ-RIO como parte do trabalho acadêmico para o professor Hamilcar Silva. O sistema tem como objetivo facilitar a reserva de laboratórios e computadores, permitindo que estudantes e professores realizem reservas de forma prática e eficiente, com funcionalidades de consulta em tempo real, notificações de notificação, e uma interface amigável e responsiva.
+Este projeto foi desenvolvido pelo Grupo 1
+(Thalles, Isabela, Raul e Philipi) para a Disciplina de 2CAW da FAETERJ-RIO como parte do trabalho acadêmico para o professor Hamilcar Silva/UNIG. O sistema tem como objetivo facilitar a reserva de laboratórios e computadores, permitindo que estudantes e professores realizem reservas de forma prática e eficiente, com funcionalidades de consulta em tempo real, notificações de notificação, e uma interface amigável e responsiva.
 
 
 ## Contato
