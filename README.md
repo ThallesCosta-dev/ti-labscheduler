@@ -32,7 +32,7 @@ O TI LabScheduler é um aplicativo web desenvolvido para gerenciar agendamentos 
    npm install express cors dotenv mysql2 jsonwebtoken bcrypt path
    ```
 4. Configure o banco de dados MySQL e crie as tabelas necessárias conforme descrito na documentação.
-   ```bash
+```bash
    -- Criar o banco de dados
 CREATE DATABASE ti_labscheduler;
 USE ti_labscheduler;
@@ -87,7 +87,7 @@ VALUES (
     '(00) 00000-0000',
     'admin'
 );
-   ```
+```
 6. Inicie o servidor:
    ```bash
    node src/server.js
