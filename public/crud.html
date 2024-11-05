@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TI LabScheduler - CRUD de Usuários</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        body {
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .login-container {
+            min-height: 100vh;
+             min-height: 100vh;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            transition: all 0.3s ease;
+        }
+
+        .dark-mode .login-container {
+            background: linear-gradient(135deg, #2d3436 0%, #000000 100%);
+            color: #fff;
+        }
+
+        .login-card {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .dark-mode .login-card {
+            background: rgba(33, 37, 41, 0.9);
+            color: #fff;
+        }
+
+        .alert {
+            border-radius: 10px;
+            animation: fadeIn 0.5s ease-in;
+        }
+    </style>
+</head>
+<body>
+    <button id="darkModeToggle" class="btn btn-outline-secondary position-fixed top-0 end-0 m-3 transition-all">
+        <i class="fas fa-moon"></i>
+    </button>
+    <div class="login-container d-flex align-items-center justify-content-center p-4">
+        <div class="login-card p-4 p-md-5" style="width: 100%; max-width: 600px;">
+            <h2 class="text-center mb-4">Gerenciamento de Usuários</h2>
+            <form id="userForm" class="needs-validation" novalidate>
+                <div class="mb-3">
+                    <label for="userName" class="form-label">Nome:</label>
+                    <input type="text" class="form-control" id="userName" placeholder="Digite o nome" required>
+                    <div class="invalid-feedback">Por favor, insira o nome.</div>
+                </div>
+                <div class="mb-3">
+                    <label for="userEmail" class="form-label">E-mail:</label>
+                    <input type="email" class="form-control" id="userEmail" placeholder="Digite o e-mail" required>
+                    <div class="invalid-feedback">Por favor, insira um e-mail válido.</div>
+                </div>
+                <button type="submit" class="btn btn-primary w-100">Adicionar Usuário</button>
+            </form>
+
+            <div id="userMessage" class="alert mt-3" style="display: none;" role="alert"></div>
+
+            <h3 class="mt-4">Lista de Usuários</h3>
+            <table class="table table-striped mt-2">
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>E-mail</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="userTableBody">
+                    <!-- Usuários serão adicionados aqui -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const userForm = document.getElementById('userForm');
+            const userTableBody = document.getElementById('userTableBody');
+            const userMessage = document.getElementById('userMessage');
+            let users = [];
+
+            const showMessage = (message, type) => {
+                userMessage.className = `alert alert-${type}`;
+                userMessage.textContent = message;
+                userMessage.style.display = 'block';
+            };
+
+            const renderUsers = () => {
+                userTableBody.innerHTML = '';
+                users.forEach((user, index) => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${user.name}</td>
+                        <td>${user.email}</td>
+                        <td>
+                            <button class="btn btn-warning btn-sm" onclick="editUser(${index})">Editar</button>
+                            <button class="btn btn-info btn-sm" onclick="resetPassword(${index})">Resetar Senha</button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteUser(${index})">Excluir</button>
+                        </td>
+                    `;
+                    userTableBody.appendChild(row);
+                });
+            };
+
+            userForm.addEventListener('submit', (event) => {
+                event.preventDefault();
+                const userName = document.getElementById('userName').value;
+                const userEmail = document.getElementById('userEmail').value;
+
+                if (userName && userEmail) {
+                    users.push({ name: userName, email: userEmail });
+                    showMessage('Usuário adicionado com sucesso!', 'success');
+                    userForm.reset();
+                    renderUsers();
+                } else {
+                    showMessage('Por favor, preencha todos os campos.', 'danger');
+                }
+            });
+
+            window.editUser = (index) => {
+                const user = users[index];
+                document.getElementById('userName').value = user.name;
+                document.getElementById('userEmail').value = user.email;
+                users.splice(index, 1);
+                renderUsers();
+                showMessage('Usuário pronto para edição.', 'info');
+            };
+
+            window.deleteUser = (index) => {
+                users.splice(index, 1);
+                renderUsers();
+                showMessage('Usuário excluído com sucesso!', 'success');
+            };
+
+            window.resetPassword = (index) => {
+                // Aqui você pode implementar a lógica para resetar a senha
+                showMessage(`Senha do usuário ${users[index].name} redefinida para "senha123".`, 'success');
+            };
+
+            // Modo Noturno
+            const darkModeToggle = document.getElementById('darkModeToggle');
+            const body = document.body;
+
+            darkModeToggle.addEventListener('click', () => {
+                body.classList.toggle('dark-mode');
+                if (body.classList.contains('dark-mode')) {
+                    darkModeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+                    localStorage.setItem('darkMode', 'enabled');
+                } else {
+                    darkModeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+                    localStorage.setItem('darkMode', 'disabled');
+                }
+            });
+
+            const darkModePreference = localStorage.getItem('darkMode');
+            if (darkModePreference === 'enabled') {
+                body.classList.add('dark-mode');
+                darkModeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+            }
+        });
+    </script>
+</body>
+</html>

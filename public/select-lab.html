@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seleção de Computadores</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa; /* Cor de fundo clara */
+            transition: background-color 0.3s ease;
+        }
+
+        .dark-mode {
+            background: linear-gradient(135deg, #2d3436 0%, #000000 100%);
+            color: #fff;
+        }
+
+        .container {
+            max-width: 500px; /* Largura máxima da página */
+        }
+
+        .login-card {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            padding: 2rem; /* Padding interno */
+        }
+
+        .dark-mode .login-card {
+            background: rgba(33, 37, 41, 0.9);
+            color: #fff;
+        }
+
+        .form-label {
+            font-weight: bold; /* Negrito para os rótulos */
+            color: #333; /* Cor do texto dos rótulos */
+        }
+
+        .dark-mode .form-label {
+            color: #fff; /* Cor do texto dos rótulos em modo escuro */
+        }
+
+        .form-control {
+            border: 1px solid #ced4da; /* Borda padrão */
+            border-radius: 0.25rem; /* Bordas arredondadas */
+        }
+
+        .dark-mode .form-control {
+            background: rgba(33, 37, 41, 0.8); /* Fundo escuro para campos de entrada */
+            border-color: #495057; /* Borda escura */
+            color: #fff; /* Cor do texto em campos de entrada */
+        }
+
+        .dark-mode .form-control:focus {
+            box-shadow: 0 0 0 0.2rem rgba(248, 249, 250, 0.25);
+        }
+
+        .seat {
+            font-size: 2rem; /* Tamanho do ícone */
+            color: #797979; /* Cor do ícone */
+            background: transparent; /* Fundo transparente */
+            border: none; /* Sem borda */
+            cursor: pointer; /* Cursor de ponteiro */
+            transition: color 0.2s, transform 0.2s; /* Efeito de transição */
+            display: flex; /* Flexbox para centralizar */
+            justify-content: center; /* Centraliza horizontalmente */
+            align-items: center; /* Centraliza verticalmente */
+        }
+
+        .seat.selected {
+            color: #007bff; /* Cor quando selecionado */
+            transform: scale(1.1); /* Aumenta o tamanho quando selecionado */
+        }
+
+        .confirmation-message {
+            display: none; /* Inicialmente escondido */
+            margin-top: 20px;
+        }
+
+        .summary {
+            background-color: #e9ecef; /* Fundo claro para o resumo */
+            padding: 15px;
+            border-radius: 5px;
+        }
+
+        .dark-mode .summary {
+            background-color: #495057; /* Fundo escuro para o resumo em modo escuro */
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+<button id="darkModeToggle" class="btn btn-outline-secondary position-fixed top-0 end-0 m-3 transition-all">
+    <i class="fas fa-moon"></i>
+</button>
+
+<button id="backButton" class="btn btn-outline-secondary position-fixed top-0 start-0 m-3 transition-all">
+    <i class="fas fa-arrow-left"></i> Voltar
+</button>
+
+<div class="container text-center my-5">
+    <div class="login-card fade-in">
+        <h2>Selecione o Computador</h2>
+        <div class="screen mb-4">Selecione o Laboratório</div>
+
+        <!-- Seleção de Laboratório -->
+        <div class="mb-4">
+            <label for="laboratorioSelect" class="form-label">Escolha o Laboratório:</label>
+            <select class="form-select" id="laboratorioSelect" required>
+                <option value="" disabled selected>Selecione um laboratório</option>
+                <option value="Laboratório 1" data-capacidade="30">Laboratório 1 - 30 computadores</option>
+                <option value="Laboratório 2" data-capacidade="18">Laboratório 2 - 18 computadores</option>
+                <option value="Laboratório 3" data-capacidade="18">Laboratório 3 - 18 computadores</option>
+                <option value="Laboratório 4" data-capacidade="24">Laboratório 4 - 24 computadores</option>
+                <option value="Laboratório 5" data-capacidade="24">Laboratório 5 - 24 computadores</option>
+            </select>
+        </div>
+
+        <div class="row justify-content-center" id="seatsContainer">
+            <!-- Os ícones de assentos serão gerados aqui -->
+        </div>
+
+        <!-- Campos de Agendamento -->
+        <div class="mb-4">
+            <label for="data" class="form-label">Data:</label>
+            <input type="date" class="form-control" id="data" required>
+        </div>
+        <div class="mb-4">
+            <label for="hora" class="form-label">Horário:</label>
+            <input type="time" class="form-control" id="hora" required>
+        </div>
+        <div class="mb-4">
+            <label for="duracao" class="form-label">Duração:</label>
+            <select class="form-select" id="duracao" required>
+                <option value="1">1 hora</option>
+                <option value="2">2 horas</option>
+                <option value="3">3 horas</option>
+                <option value="4">4 horas</option>
+            </select>
+        </div>
+
+        <button id="agendarButton" class="btn btn-primary mb-4">Agendar</button>
+
+        <div class="confirmation-message alert alert-success fade-in" id="confirmationMessage">
+            Agendamento confirmado com sucesso!
+        </div>
+
+        <!-- Resumo do Pedido -->
+        <div class="summary mt-5 fade-in">
+            <h4>Resumo do Pedido</h4>
+            <p>Computadores Selecionados: <span id="selected-seats"></span></p>
+        </div>
+    </div>
+</div>
+
+<script src="/js/auth.js"></script>
+
+<script>
+    const laboratorioSelect = document.getElementById('laboratorioSelect');
+    const seatsContainer = document.getElementById('seatsContainer');
+    const selectedSeats = document.getElementById('selected-seats');
+    const agendarButton = document.getElementById('agendarButton');
+    const confirmationMessage = document.getElementById('confirmationMessage');
+    const backButton = document.getElementById('backButton');
+
+    laboratorioSelect.addEventListener('change', () => {
+        // Limpa os assentos anteriores
+        seatsContainer.innerHTML = '';
+
+        // Obtém a capacidade do laboratório selecionado
+        const selectedOption = laboratorioSelect.options[laboratorioSelect.selectedIndex];
+        const capacidade = selectedOption.getAttribute('data-capacidade');
+
+        // Gera os ícones de assentos de acordo com a capacidade
+        for (let i = 1; i <= capacidade; i++) {
+            const colDiv = document.createElement('div');
+            colDiv.className = 'col-2';
+            const seatIcon = document.createElement('button');
+            seatIcon.className = 'seat';
+            seatIcon.id = 'comp' + i;
+            seatIcon.innerHTML = '<i class="fas fa-desktop"></i>'; // Ícone de computador
+
+            // Adiciona evento para selecionar o assento
+            seatIcon.addEventListener('click', () => {
+                seatIcon.classList.toggle('selected');
+                updateSelectedSeats();
+            });
+
+            colDiv.appendChild(seatIcon);
+            seatsContainer.appendChild(colDiv);
+        }
+    });
+
+    function updateSelectedSeats() {
+        const selected = document.querySelectorAll('.seat.selected');
+        const selectedIds = Array.from(selected).map(seat => seat.id);
+        selectedSeats.textContent = selectedIds.join(', ') || 'Nenhum';
+    }
+
+    agendarButton.addEventListener('click', async () => {
+        const data = document.getElementById('data').value;
+        const hora = document.getElementById('hora').value;
+        const duracao = document.getElementById('duracao').value;
+        const laboratorio = laboratorioSelect.value;
+        const computadores = Array.from(document.querySelectorAll('.seat.selected'))
+            .map(seat => seat.id);
+
+        if (!data || !hora || !duracao || !laboratorio || computadores.length === 0) {
+            alert('Por favor, preencha todos os campos e selecione pelo menos um computador.');
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/schedulings', {
+                method: 'POST',
+                headers: auth.getHeaders(),
+                body: JSON.stringify({
+                    laboratory: laboratorio,
+                    computerNumber: computadores.join(','),
+                    date: data,
+                    time: hora,
+                    duration: parseInt(duracao)
+                })
+            });
+
+            const result = await response.json();
+            
+            if (response.ok) {
+                confirmationMessage.style.display = 'block';
+                setTimeout(() => {
+                    window.location.href = 'consultar-agendamentos.html';
+                }, 2000);
+            } else {
+                alert(result.message || 'Erro ao criar agendamento');
+            }
+        } catch (error) {
+            alert('Erro ao criar agendamento. Tente novamente.');
+        }
+    });
+
+    // Modo Noturno
+    const darkModeToggle = document.getElementById('darkModeToggle');
+    const body = document.body;
+
+    darkModeToggle.addEventListener('click', () => {
+        body.classList.toggle('dark-mode');
+        if (body.classList.contains('dark-mode')) {
+            darkModeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+            localStorage.setItem('darkMode', 'enabled');
+        } else {
+            darkModeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+            localStorage.setItem('darkMode', 'disabled');
+        }
+    });
+
+    const darkModePreference = localStorage.getItem('darkMode');
+    if (darkModePreference === 'enabled') {
+        body.classList.add('dark-mode');
+        darkModeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+    }
+
+    // Função para voltar à página anterior
+    backButton.addEventListener('click', () => {
+        window.history.back(); // Volta para a página anterior
+    });
+    document.addEventListener('DOMContentLoaded', () => {
+        if (!auth.isAuthenticated()) {
+            window.location.href = 'login.html';
+            return;
+        }
+    });
+</script>
+
+</body>
+</html>

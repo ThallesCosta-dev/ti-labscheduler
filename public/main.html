@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TI LabScheduler - Tela Principal</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        body {
+            transition: background-color 0.3s ease, color 0.3s ease; /* Transição suave para o fundo e cor do texto */
+        }
+
+        .main-container {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .dark-mode .main-container {
+            background: linear-gradient(135deg, #2d3436 0%, #000000 100%);
+            color: #fff;
+        }
+
+        .main-card {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            padding: 2rem;
+            text-align: center;
+            width: 100%;
+            max-width: 450px;
+        }
+
+        .dark-mode .main-card {
+            background: rgba(33, 37, 41, 0.9);
+            color: #fff;
+        }
+
+        .main-title {
+            color: #2c3e50;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .dark-mode .main-title {
+            color: #fff;
+        }
+
+        .btn-main {
+            border-radius: 10px;
+            padding: 0.75rem 2rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .alert {
+            border-radius: 10px;
+            animation: fadeIn 0.5s ease-in;
+        }
+    </style>
+</head>
+<body>
+    <script src="/js/auth.js"></script>
+    <script>
+        let userRole = null;
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (!auth.isAuthenticated()) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            // Decodifica o token para obter a role do usuário
+            const token = localStorage.getItem('token');
+            if (token) {
+                const payload = JSON.parse(atob(token.split('.')[1]));
+                userRole = payload.role;
+                
+                // Controla a visibilidade do botão admin
+                const adminButton = document.getElementById('adminPanelButton');
+                if (adminButton) {
+                    adminButton.style.display = userRole === 'admin' ? 'block' : 'none';
+                }
+            }
+        });
+    </script>
+    <button id="darkModeToggle" class="btn btn-outline-secondary position-fixed top-0 end-0 m-3 transition-all">
+        <i class="fas fa-moon"></i>
+    </button>
+    <div class="main-container">
+        <div class="main-card fade-in">
+            <i class="fas fa-laptop-code fa-3x mb-3"></i>
+            <h2 class="main-title">TI LabScheduler</h2>
+            <p class="slogan mb-4">Maximizando o uso, facilitando o acesso!</p>
+
+            <div class="d-grid gap-2">
+                <button class="btn btn-primary btn-main" onclick="window.location.href='select-lab.html'">
+                    <i class="fas fa-calendar-plus me-2"></i> Agendar
+                </button>
+                <button class="btn btn-primary btn-main" onclick="window.location.href='consultar-agendamentos.html'">
+                    <i class="fas fa-calendar-check me-2"></i> Consultar Agendamentos
+                </button>
+                <button id="adminPanelButton" class="btn btn-warning btn-main" onclick="window.location.href='admin-panel.html'" style="display: none;">
+                    <i class="fas fa-user-shield me-2"></i> Painel Administrativo
+                </button>
+                <button class="btn btn-danger btn-main" onclick="logout()">
+                    <i class="fas fa-sign-out-alt me-2"></i> Logout
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const logout = () => {
+            if (typeof auth !== 'undefined') {
+                auth.logout();
+            } else {
+                window.location.href = 'login.html';
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const darkModeToggle = document.getElementById('darkModeToggle');
+            const body = document.body;
+
+            darkModeToggle.addEventListener('click', () => {
+                body.classList.toggle('dark-mode');
+                if (body.classList.contains('dark-mode')) {
+                    darkModeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+                    localStorage.setItem('darkMode', 'enabled');
+                } else {
+                    darkModeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+                    localStorage.setItem('darkMode', 'disabled');
+                }
+            });
+
+            const darkModePreference = localStorage.getItem('darkMode');
+            if (darkModePreference === 'enabled') {
+                body.classList.add('dark-mode');
+                darkModeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+            }
+        });
+    </script>
+</body>
+</html>
