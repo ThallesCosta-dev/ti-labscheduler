@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TI LabScheduler - Criar Usuário</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        
+        body.dark-mode {
+            background: linear-gradient(135deg, #2d3436 0%, #000000 100%);
+            color: #fff;
+        }
+        
+        .login-container {
+            min-height: 100vh;
+            transition: all 0.3s ease;
+        }
+        
+        .login-card {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+        
+        .dark-mode .login-card {
+            background: rgba(33, 37, 41, 0.9);
+            color: #fff;
+        }
+        
+        .login-title, #ti-labscheduler {
+            color: #2c3e50;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .dark-mode .login-title,
+        .dark-mode #ti-labscheduler,
+        .dark-mode .slogan,
+        .dark-mode .card-title,
+        .dark-mode .form-label,
+        .dark-mode .form-check-label {
+            color: #fff;
+        }
+        
+        .form-control {
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s ease;
+            background: #fff;
+            color: #000;
+        }
+        
+        .dark-mode .form-control {
+            background: #2c3e50;
+            border-color: #495057;
+            color: #fff;
+        }
+        
+        .dark-mode .form-control:focus {
+            background: #2c3e50;
+            color: #fff;
+            border-color: #0d6efd;
+        }
+        
+        .dark-mode .form-control::placeholder {
+            color: #adb5bd; 
+        }
+        
+        .form-control::placeholder {
+            color: #6c757d;  
+        }
+        
+        .btn-primary {
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .dark-mode .btn-outline-secondary {
+            color: #fff;
+            border-color: #fff;
+        }
+        
+        .dark-mode .btn-outline-secondary:hover {
+            background-color: #fff;
+            color: #1a1a1a;
+        }
+        
+        .dark-mode .login-link,
+        .dark-mode .login-link a {
+            color: #fff;
+            text-align: center;
+        }
+        
+        .dark-mode .login-link a {
+            color: #0d6efd;
+            text-align: center;
+        }
+        
+        .dark-mode .privacy-terms {
+            color: #ccc;
+            text-align: center;
+        }
+        
+        .dark-mode footer p {
+            color: #fff;
+        }
+        
+        .dark-mode .form-check-input:checked {
+            background-color: #0d6efd;
+            border-color: #0d6efd;
+        }
+
+        .login-link,
+        .privacy-terms {
+            text-align: center;
+            margin-top: 1rem; 
+        }
+        
+        .dark-mode .login-link,
+        .dark-mode .privacy-terms {
+            color: #fff; 
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="login-container fade-in"> 
+    <button id="darkModeToggle" class="btn btn-outline-secondary position-fixed top-0 end-0 m-3 transition-all">
+        <i class="fas fa-moon"></i>
+    </button>
+    
+    <button id="backButton" class="btn btn-outline-secondary position-fixed top-0 start-0 m-3 transition-all">
+        <i class="fas fa-arrow-left"></i> Voltar
+    </button>
+
+    <div class="container py-4">
+        <div class="login-card p-4 p-md-5 fade-in" style="width: 100%; max-width: 650px; margin: auto;">
+            <div class="text-center mb-3">
+                <i class="fas fa-laptop-code fa-3x"></i> <!-- Centralizado -->
+            </div>
+            <h1 class="text-center mb-3 fade-in" id="ti-labscheduler">TI LabScheduler</h1>
+            <p class="slogan text-center mb-4 fade-in">Maximizando o uso, facilitando o acesso!</p>
+
+            <div id="createUserMessage" class="alert fade-in" style="display: none;" role="alert"></div> <!-- Mensagem de sucesso -->
+
+            <h4 class="card-title text-center mb-4">Criar uma nova conta</h4>
+            <form id="createUserForm" class="needs-validation" novalidate>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="fullName" class="form-label">Nome Completo:</label>
+                        <input type="text" class="form-control" id="fullName" placeholder="Digite seu nome completo" required>
+                        <div class="invalid-feedback">
+                            Por favor, insira seu nome completo.
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label for="matricula" class="form-label">Matrícula:</label>
+                        <input type="text" class="form-control" id="matricula" placeholder="Digite sua matrícula" required>
+                        <div class="invalid-feedback">
+                            Por favor, insira sua matrícula.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="email" class="form-label">E-mail Institucional:</label>
+                        <input type="email" class="form-control" id="email" placeholder="Digite seu e-mail" required>
+                        <div class="invalid-feedback">
+                            Por favor, insira um e-mail válido.
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label for="birthDate" class="form-label">Data de Nascimento:</label>
+                        <input type="date" class="form-control" id="birthDate" required>
+                        <div class="invalid-feedback">
+                            Por favor, insira sua data de nascimento.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="phone" class="form-label">Telefone:</label>
+                    <input type="tel" class="form-control" id="phone" placeholder="Digite seu telefone" required>
+                    <div class="invalid-feedback">
+                        Por favor, insira seu telefone.
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="password" class="form-label">Senha:</label>
+                        <input type="password" class="form-control" id="password" placeholder="Digite sua senha" required>
+                        <div class="invalid-feedback">
+                            Por favor, insira uma senha.
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label for="confirmPassword" class="form-label">Confirmar Senha:</label>
+                        <input type="password" class="form-control" id="confirmPassword" placeholder="Confirme sua senha" required>
+                        <div class="invalid-feedback">
+                            Por favor, confirme sua senha.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label d-block">Você é:</label>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="userType" id="alunoRadio" value="aluno" required>
+                        <label class="form-check-label" for="alunoRadio">
+                            Aluno
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="userType" id="professorRadio" value="professor">
+                        <label class="form-check-label" for="professorRadio">
+                            Professor
+                        </label>
+                    </div>
+                    <div class="invalid-feedback">
+                        Por favor, selecione se você é aluno ou professor.
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100">Criar Usuário</button>
+                <p class="login-link">Já tem conta? <a href="login.html">Entrar</a>.</p>
+                <p class="privacy-terms">Ao clicar em Criar Usuário, você concorda com nossos Termos, Política de Privacidade e Política de Cookies.</p>
+            </form>
+        </div>
+
+        <footer class="footer text-center mt-4">
+            <p>Copyright © 2024 Thalles Costa. Todos os direitos reservados. Thalles Ferreira Costa Ltda.</p>
+        </footer>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+    <script src="script.js"></script>
+    <script>
+        // Modo Noturno
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        const body = document.body;
+
+        darkModeToggle.addEventListener('click', () => {
+            body.classList.toggle('dark-mode');
+            if (body.classList.contains('dark-mode')) {
+                darkModeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+                localStorage.setItem('darkMode', 'enabled');
+            } else {
+                darkModeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+                localStorage.setItem('darkMode', 'disabled');
+            }
+        });
+
+        const darkModePreference = localStorage.getItem('darkMode');
+        if (darkModePreference === 'enabled') {
+            body.classList.add('dark-mode');
+            darkModeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+        }
+
+        // Função para voltar à página anterior
+        document.getElementById('backButton').addEventListener('click', () => {
+            window.history.back(); // Volta para a página anterior
+        });
+
+        // Validação do formulário de criação de conta
+        document.getElementById('createUserForm').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const createUserMessage = document.getElementById('createUserMessage');
+            createUserMessage.style.display = 'none';
+
+            const fullName = document.getElementById('fullName').value;
+            const matricula = document.getElementById('matricula').value;
+            const email = document.getElementById('email').value;
+            const birthDate = document.getElementById('birthDate').value;
+            const phone = document.getElementById('phone').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            let isValid = true;
+
+            if (!fullName) {
+                showMessage('Por favor, insira seu nome completo.', 'danger');
+                isValid = false;
+            }
+            if (!matricula) {
+                showMessage('Por favor, insira sua matrícula.', 'danger');
+                isValid = false;
+            }
+            if (!email) {
+                showMessage('Por favor, insira seu e-mail.', 'danger');
+                isValid = false;
+            }
+            if (!birthDate) {
+                showMessage('Por favor, insira sua data de nascimento.', 'danger');
+                isValid = false;
+            }
+            if (!phone) {
+                showMessage('Por favor, insira seu telefone.', 'danger');
+                isValid = false;
+            }
+            if (!password) {
+                showMessage('Por favor, insira sua senha.', 'danger');
+                isValid = false;
+            }
+            if (password !== confirmPassword) {
+                showMessage('As senhas não coincidem.', 'danger');
+                isValid = false;
+            }
+
+            if (isValid) {
+                try {
+                    const response = await fetch('/api/users/register', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            name: fullName,
+                            email: email,
+                            password: password,
+                            matricula: matricula,
+                            birthDate: birthDate,
+                            phone: phone,
+                            type: 'user'
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        createUserMessage.className = 'alert alert-success fade-in';
+                        createUserMessage.textContent = 'Conta criada com sucesso! Redirecionando...';
+                        createUserMessage.style.display = 'block';
+
+                        setTimeout(() => {
+                            window.location.href = 'login.html';
+                        }, 2000);
+                    } else {
+                        createUserMessage.className = 'alert alert-danger fade-in';
+                        createUserMessage.textContent = data.message || 'Erro ao criar conta.';
+                        createUserMessage.style.display = 'block';
+                    }
+                } catch (error) {
+                    createUserMessage.className = 'alert alert-danger fade-in';
+                    createUserMessage.textContent = 'Erro ao conectar com o servidor.';
+                    createUserMessage.style.display = 'block';
+                }
+            }
+        });
+
+        // Funções de validação para cada tipo de campo
+        const validators = {
+            fullName: {
+                validate: (value) => {
+                    const regex = /^[a-zA-ZÀ-ÿ\s]{3,100}$/;
+                    if (!value) return 'O nome completo é obrigatório.';
+                    if (!regex.test(value)) return 'O nome deve conter apenas letras e espaços, com 3 a 100 caracteres.';
+                    if (value.split(' ').length < 2) return 'Por favor, insira nome e sobrenome.';
+                    return null;
+                }
+            },
+            matricula: {
+                validate: (value) => {
+                    const regex = /^\d{5,20}$/;
+                    if (!value) return 'A matrícula é obrigatória.';
+                    if (!regex.test(value)) return 'A matrícula deve conter apenas números, entre 5 e 20 dígitos.';
+                    return null;
+                }
+            },
+            email: {
+                validate: (value) => {
+                    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    if (!value) return 'O e-mail é obrigatório.';
+                    if (!regex.test(value)) return 'Por favor, insira um e-mail válido.';
+                    if (!value.includes('.edu.br')) return 'Por favor, utilize um e-mail institucional (.edu.br)';
+                    return null;
+                }
+            },
+            birthDate: {
+                validate: (value) => {
+                    if (!value) return 'A data de nascimento é obrigatória.';
+                    const date = new Date(value);
+                    const today = new Date();
+                    const age = today.getFullYear() - date.getFullYear();
+                    if (age < 15) return 'Você deve ter pelo menos 15 anos para se cadastrar.';
+                    if (age > 100) return 'Por favor, insira uma data de nascimento válida.';
+                    if (date > today) return 'A data de nascimento não pode ser no futuro.';
+                    return null;
+                }
+            },
+            phone: {
+                validate: (value) => {
+                    const regex = /^\(?[1-9]{2}\)? ?(?:[2-8]|9[1-9])[0-9]{3}\-?[0-9]{4}$/;
+                    if (!value) return 'O telefone é obrigatório.';
+                    if (!regex.test(value)) return 'Por favor, insira um telefone válido (ex: (11) 98888-8888).';
+                    return null;
+                }
+            },
+            password: {
+                validate: (value) => {
+                    if (!value) return 'A senha é obrigatória.';
+                    if (value.length < 8) return 'A senha deve ter no mínimo 8 caracteres.';
+                    if (!/[A-Z]/.test(value)) return 'A senha deve conter pelo menos uma letra maiúscula.';
+                    if (!/[a-z]/.test(value)) return 'A senha deve conter pelo menos uma letra minúscula.';
+                    if (!/[0-9]/.test(value)) return 'A senha deve conter pelo menos um número.';
+                    if (!/[!@#$%^&*]/.test(value)) return 'A senha deve conter pelo menos um caractere especial (!@#$%^&*).';
+                    return null;
+                }
+            }
+        };
+
+        // Função para formatar o telefone enquanto digita
+        function formatPhoneNumber(input) {
+            let value = input.value.replace(/\D/g, '');
+            if (value.length > 11) value = value.slice(0, 11);
+            
+            if (value.length > 7) {
+                value = `(${value.slice(0, 2)}) ${value.slice(2, 7)}-${value.slice(7)}`;
+            } else if (value.length > 2) {
+                value = `(${value.slice(0, 2)}) ${value.slice(2)}`;
+            }
+            
+            input.value = value;
+        }
+
+        // Função para mostrar mensagens de erro/sucesso
+        function showMessage(message, type) {
+            const messageElement = document.getElementById('createUserMessage');
+            messageElement.className = `alert alert-${type} fade-in`;
+            messageElement.textContent = message;
+            messageElement.style.display = 'block';
+            
+            if (type === 'success') {
+                setTimeout(() => {
+                    messageElement.style.display = 'none';
+                }, 5000);
+            }
+        }
+
+        // Função para validar um campo específico
+        function validateField(fieldId) {
+            const field = document.getElementById(fieldId);
+            const validator = validators[fieldId];
+            
+            if (validator) {
+                const error = validator.validate(field.value);
+                const feedbackElement = field.nextElementSibling;
+                
+                if (error) {
+                    field.classList.add('is-invalid');
+                    field.classList.remove('is-valid');
+                    feedbackElement.textContent = error;
+                    return false;
+                } else {
+                    field.classList.remove('is-invalid');
+                    field.classList.add('is-valid');
+                    return true;
+                }
+            }
+            return true;
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Aplicar máscara ao telefone
+            const phoneInput = document.getElementById('phone');
+            phoneInput.addEventListener('input', () => formatPhoneNumber(phoneInput));
+            
+            // Validação em tempo real para cada campo
+            Object.keys(validators).forEach(fieldId => {
+                const field = document.getElementById(fieldId);
+                if (field) {
+                    field.addEventListener('blur', () => validateField(fieldId));
+                    field.addEventListener('input', () => {
+                        if (field.classList.contains('is-invalid')) {
+                            validateField(fieldId);
+                        }
+                    });
+                }
+            });
+
+            // Validação do formulário no envio
+            const form = document.getElementById('createUserForm');
+            form.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                
+                // Validar todos os campos
+                let isValid = true;
+                Object.keys(validators).forEach(fieldId => {
+                    if (!validateField(fieldId)) {
+                        isValid = false;
+                    }
+                });
+
+                // Validar tipo de usuário
+                const userType = document.querySelector('input[name="userType"]:checked');
+                if (!userType) {
+                    document.querySelector('.form-check-input').classList.add('is-invalid');
+                    showMessage('Por favor, selecione se você é aluno ou professor.', 'danger');
+                    isValid = false;
+                }
+
+                if (isValid) {
+                    try {
+                        const response = await fetch('/api/users/register', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                name: document.getElementById('fullName').value,
+                                email: document.getElementById('email').value,
+                                password: document.getElementById('password').value,
+                                matricula: document.getElementById('matricula').value,
+                                birthDate: document.getElementById('birthDate').value,
+                                phone: document.getElementById('phone').value,
+                                type: userType.value
+                            })
+                        });
+
+                        const data = await response.json();
+
+                        if (response.ok) {
+                            showMessage('Conta criada com sucesso! Redirecionando...', 'success');
+                            setTimeout(() => {
+                                window.location.href = 'login.html';
+                            }, 2000);
+                        } else {
+                            showMessage(data.message || 'Erro ao criar conta.', 'danger');
+                        }
+                    } catch (error) {
+                        console.error('Erro:', error);
+                        showMessage('Erro ao conectar com o servidor.', 'danger');
+                    }
+                }
+            });
+
+            // Prevenir envio do formulário com Enter
+            document.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                }
+            });
+
+            // Limpar mensagens de erro ao trocar entre campos
+            document.querySelectorAll('input').forEach(input => {
+                input.addEventListener('focus', () => {
+                    document.getElementById('createUserMessage').style.display = 'none';
+                });
+            });
+        });
+    </script>
+</body>
+</html>
