@@ -8,7 +8,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
     <style>
         body {
-            background-color: #f8f9fa; /* Cor de fundo clara */
+            background-color: #f8f9fa; 
             transition: background-color 0.3s ease;
         }
 
@@ -18,7 +18,7 @@
         }
 
         .container {
-            max-width: 500px; /* Largura máxima da página */
+            max-width: 500px; 
         }
 
         .login-card {
@@ -142,37 +142,37 @@
         <!-- Novos campos -->
         <div class="mb-4">
             <label for="encarregado" class="form-label">Encarregado do Setor:</label>
-            <input type="text" class="form-control" id="encarregado" required>
+            <input type="text" class="form-control" id="encarregado" required placeholder="Ex: Prof. Maria Santos">
         </div>
 
         <div class="mb-4">
             <label for="responsavel" class="form-label">Responsável pela Utilização:</label>
-            <input type="text" class="form-control" id="responsavel" required>
+            <input type="text" class="form-control" id="responsavel" required placeholder="Ex: Prof. João Silva">
         </div>
 
         <div class="mb-4">
             <label for="qtdAlunos" class="form-label">Quantidade de Alunos:</label>
-            <input type="number" class="form-control" id="qtdAlunos" min="1" required>
+            <input type="number" class="form-control" id="qtdAlunos" min="1" required placeholder="Ex: 30">
         </div>
 
         <div class="mb-4">
             <label for="programas" class="form-label">Programas Necessários:</label>
-            <textarea class="form-control" id="programas" rows="3" placeholder="Liste os programas necessários" required></textarea>
+            <textarea class="form-control" id="programas" rows="3" placeholder="Ex: Visual Studio Code, MySQL Workbench, Eclipse" required></textarea>
         </div>
 
         <div class="mb-4">
             <label for="data" class="form-label">Data de Utilização:</label>
-            <input type="date" class="form-control" id="data" required>
+            <input type="date" class="form-control" id="data" required placeholder="dd/mm/aaaa">
         </div>
 
         <div class="row">
             <div class="col-md-6 mb-4">
                 <label for="horaInicio" class="form-label">Horário de Início:</label>
-                <input type="time" class="form-control" id="horaInicio" required>
+                <input type="time" class="form-control" id="horaInicio" required placeholder="00:00">
             </div>
             <div class="col-md-6 mb-4">
                 <label for="horaFim" class="form-label">Horário de Término:</label>
-                <input type="time" class="form-control" id="horaFim" required>
+                <input type="time" class="form-control" id="horaFim" required placeholder="00:00">
             </div>
         </div>
 

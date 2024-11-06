@@ -61,7 +61,7 @@ class User {
 
     static async getAll() {
         const [users] = await pool.execute(
-            'SELECT id, name, email, role FROM users'
+            'SELECT id, name, email, role, matricula, birth_date, phone FROM users'
         );
         return users;
     }

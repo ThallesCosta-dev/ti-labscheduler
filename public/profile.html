@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TI LabScheduler - Perfil</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <link href="style.css" rel="stylesheet">
+    <script src="/js/auth.js"></script>
+</head>
+<body>
+    <button id="darkModeToggle" class="btn btn-outline-secondary position-fixed top-0 end-0 m-3 transition-all">
+        <i class="fas fa-moon"></i>
+    </button>
+    <button id="backButton" class="btn btn-outline-secondary position-fixed top-0 start-0 m-3 transition-all">
+        <i class="fas fa-arrow-left"></i> Voltar
+    </button>
+
+    <div class="login-container d-flex align-items-center justify-content-center py-5">
+        <div class="login-card p-4 w-100" style="max-width: 500px;">
+            <h2 class="text-center mb-4">Meu Perfil</h2>
+            
+            <div class="user-info mb-4">
+                <div class="mb-3">
+                    <label class="fw-bold">Nome:</label>
+                    <p id="userName"></p>
+                </div>
+                <div class="mb-3">
+                    <label class="fw-bold">E-mail:</label>
+                    <p id="userEmail"></p>
+                </div>
+                <div class="mb-3">
+                    <label class="fw-bold">Matrícula:</label>
+                    <p id="userMatricula"></p>
+                </div>
+                <div class="mb-3">
+                    <label class="fw-bold">Data de Nascimento:</label>
+                    <p id="userBirthDate"></p>
+                </div>
+                <div class="mb-3">
+                    <label class="fw-bold">Telefone:</label>
+                    <p id="userPhone"></p>
+                </div>
+                <div class="mb-3">
+                    <label class="fw-bold">Tipo de Usuário:</label>
+                    <p id="userType"></p>
+                </div>
+            </div>
+
+            <h3 class="text-center mb-3">Alterar Senha</h3>
+            <form id="changePasswordForm" class="needs-validation" novalidate>
+                <div class="mb-3">
+                    <label for="currentPassword" class="form-label">Senha Atual:</label>
+                    <input type="password" class="form-control" id="currentPassword" required>
+                </div>
+                <div class="mb-3">
+                    <label for="newPassword" class="form-label">Nova Senha:</label>
+                    <input type="password" class="form-control" id="newPassword" required>
+                </div>
+                <div class="mb-3">
+                    <label for="confirmPassword" class="form-label">Confirme a Nova Senha:</label>
+                    <input type="password" class="form-control" id="confirmPassword" required>
+                </div>
+                <button type="submit" class="btn btn-primary w-100">Alterar Senha</button>
+            </form>
+
+            <div id="messageAlert" class="alert mt-3" style="display: none;"></div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (!auth.isAuthenticated()) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            const token = localStorage.getItem('token');
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            const userId = payload.id;
+
+            // Carregar dados do usuário
+            try {
+                const response = await fetch(`/api/users/${userId}`, {
+                    headers: auth.getHeaders()
+                });
+                
+                if (!response.ok) throw new Error('Erro ao carregar dados do usuário');
+                
+                const user = await response.json();
+                
+                document.getElementById('userName').textContent = user.name;
+                document.getElementById('userEmail').textContent = user.email;
+                document.getElementById('userMatricula').textContent = user.matricula || '-';
+                document.getElementById('userBirthDate').textContent = user.birth_date ? 
+                    new Date(user.birth_date).toLocaleDateString('pt-BR') : '-';
+                document.getElementById('userPhone').textContent = user.phone || '-';
+                document.getElementById('userType').textContent = user.role === 'admin' ? 
+                    'Administrador' : 'Usuário';
+            } catch (error) {
+                showMessage(error.message, 'danger');
+            }
+
+            // Formulário de alteração de senha
+            const changePasswordForm = document.getElementById('changePasswordForm');
+            changePasswordForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const currentPassword = document.getElementById('currentPassword').value;
+                const newPassword = document.getElementById('newPassword').value;
+                const confirmPassword = document.getElementById('confirmPassword').value;
+
+                if (newPassword !== confirmPassword) {
+                    showMessage('As senhas não coincidem', 'danger');
+                    return;
+                }
+
+                try {
+                    const response = await fetch(`/api/users/${userId}/change-password`, {
+                        method: 'POST',
+                        headers: auth.getHeaders(),
+                        body: JSON.stringify({
+                            currentPassword,
+                            newPassword
+                        })
+                    });
+
+                    if (!response.ok) {
+                        const data = await response.json();
+                        throw new Error(data.message || 'Erro ao alterar senha');
+                    }
+
+                    showMessage('Senha alterada com sucesso!', 'success');
+                    changePasswordForm.reset();
+                } catch (error) {
+                    showMessage(error.message, 'danger');
+                }
+            });
+
+            // Botão voltar
+            document.getElementById('backButton').addEventListener('click', () => {
+                window.location.href = 'main.html';
+            });
+
+            // Modo noturno
+            const darkModeToggle = document.getElementById('darkModeToggle');
+            const body = document.body;
+
+            darkModeToggle.addEventListener('click', () => {
+                body.classList.toggle('dark-mode');
+                if (body.classList.contains('dark-mode')) {
+                    darkModeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+                    localStorage.setItem('darkMode', 'enabled');
+                } else {
+                    darkModeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+                    localStorage.setItem('darkMode', 'disabled');
+                }
+            });
+
+            if (localStorage.getItem('darkMode') === 'enabled') {
+                body.classList.add('dark-mode');
+                darkModeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+            }
+        });
+
+        function showMessage(message, type) {
+            const messageAlert = document.getElementById('messageAlert');
+            messageAlert.className = `alert alert-${type} mt-3`;
+            messageAlert.textContent = message;
+            messageAlert.style.display = 'block';
+            setTimeout(() => messageAlert.style.display = 'none', 3000);
+        }
+    </script>
+</body>
+</html> 

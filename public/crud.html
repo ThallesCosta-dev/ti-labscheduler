@@ -6,6 +6,7 @@
     <title>TI LabScheduler - CRUD de Usuários</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <script src="/js/auth.js"></script>
     
     <style>
         body {
@@ -14,7 +15,6 @@
 
         .login-container {
             min-height: 100vh;
-             min-height: 100vh;
             background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             transition: all 0.3s ease;
         }
@@ -37,120 +37,240 @@
             color: #fff;
         }
 
-        .alert {
-            border-radius: 10px;
+        .dark-mode .table {
+            color: #fff;
+        }
+
+        .fade-in {
             animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
 <body>
-    <button id="darkModeToggle" class="btn btn-outline-secondary position-fixed top-0 end-0 m-3 transition-all">
+    <button id="darkModeToggle" class="btn btn-outline-secondary position-fixed top-0 end-0 m-3">
         <i class="fas fa-moon"></i>
     </button>
+    <button id="backButton" class="btn btn-outline-secondary position-fixed top-0 start-0 m-3">
+        <i class="fas fa-arrow-left"></i> Voltar
+    </button>
+
     <div class="login-container d-flex align-items-center justify-content-center p-4">
-        <div class="login-card p-4 p-md-5" style="width: 100%; max-width: 600px;">
+        <div class="login-card p-4 p-md-5" style="width: 100%; max-width: 800px;">
             <h2 class="text-center mb-4">Gerenciamento de Usuários</h2>
+            
             <form id="userForm" class="needs-validation" novalidate>
                 <div class="mb-3">
                     <label for="userName" class="form-label">Nome:</label>
-                    <input type="text" class="form-control" id="userName" placeholder="Digite o nome" required>
-                    <div class="invalid-feedback">Por favor, insira o nome.</div>
+                    <input type="text" class="form-control" id="userName" required>
                 </div>
                 <div class="mb-3">
                     <label for="userEmail" class="form-label">E-mail:</label>
-                    <input type="email" class="form-control" id="userEmail" placeholder="Digite o e-mail" required>
-                    <div class="invalid-feedback">Por favor, insira um e-mail válido.</div>
+                    <input type="email" class="form-control" id="userEmail" required>
+                </div>
+                <div class="mb-3">
+                    <label for="userType" class="form-label">Tipo de Usuário:</label>
+                    <select class="form-control" id="userType" required>
+                        <option value="">Selecione o tipo</option>
+                        <option value="user">Usuário</option>
+                        <option value="admin">Administrador</option>
+                    </select>
                 </div>
                 <button type="submit" class="btn btn-primary w-100">Adicionar Usuário</button>
             </form>
 
-            <div id="userMessage" class="alert mt-3" style="display: none;" role="alert"></div>
+            <div id="userMessage" class="alert mt-3" style="display: none;"></div>
 
-            <h3 class="mt-4">Lista de Usuários</h3>
-            <table class="table table-striped mt-2">
-                <thead>
-                    <tr>
-                        <th>Nome</th>
-                        <th>E-mail</th>
-                        <th>Ações</th>
-                    </tr>
-                </thead>
-                <tbody id="userTableBody">
-                    <!-- Usuários serão adicionados aqui -->
-                </tbody>
-            </table>
+            <div class="mt-4">
+                <h3>Lista de Usuários</h3>
+                <div class="table-responsive">
+                    <table class="table table-striped mt-4">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nome</th>
+                                <th>Matrícula</th>
+                                <th>E-mail</th>
+                                <th>Data Nascimento</th>
+                                <th>Telefone</th>
+                                <th>Tipo</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="userTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (!auth.isAuthenticated()) {
+                window.location.href = 'login.html';
+                return;
+            }
+
             const userForm = document.getElementById('userForm');
             const userTableBody = document.getElementById('userTableBody');
             const userMessage = document.getElementById('userMessage');
-            let users = [];
-
-            const showMessage = (message, type) => {
-                userMessage.className = `alert alert-${type}`;
-                userMessage.textContent = message;
-                userMessage.style.display = 'block';
-            };
-
-            const renderUsers = () => {
-                userTableBody.innerHTML = '';
-                users.forEach((user, index) => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td>${user.name}</td>
-                        <td>${user.email}</td>
-                        <td>
-                            <button class="btn btn-warning btn-sm" onclick="editUser(${index})">Editar</button>
-                            <button class="btn btn-info btn-sm" onclick="resetPassword(${index})">Resetar Senha</button>
-                            <button class="btn btn-danger btn-sm" onclick="deleteUser(${index})">Excluir</button>
-                        </td>
-                    `;
-                    userTableBody.appendChild(row);
-                });
-            };
-
-            userForm.addEventListener('submit', (event) => {
-                event.preventDefault();
-                const userName = document.getElementById('userName').value;
-                const userEmail = document.getElementById('userEmail').value;
-
-                if (userName && userEmail) {
-                    users.push({ name: userName, email: userEmail });
-                    showMessage('Usuário adicionado com sucesso!', 'success');
-                    userForm.reset();
-                    renderUsers();
-                } else {
-                    showMessage('Por favor, preencha todos os campos.', 'danger');
-                }
-            });
-
-            window.editUser = (index) => {
-                const user = users[index];
-                document.getElementById('userName').value = user.name;
-                document.getElementById('userEmail').value = user.email;
-                users.splice(index, 1);
-                renderUsers();
-                showMessage('Usuário pronto para edição.', 'info');
-            };
-
-            window.deleteUser = (index) => {
-                users.splice(index, 1);
-                renderUsers();
-                showMessage('Usuário excluído com sucesso!', 'success');
-            };
-
-            window.resetPassword = (index) => {
-                // Aqui você pode implementar a lógica para resetar a senha
-                showMessage(`Senha do usuário ${users[index].name} redefinida para "senha123".`, 'success');
-            };
-
-            // Modo Noturno
             const darkModeToggle = document.getElementById('darkModeToggle');
             const body = document.body;
 
+            // Função para mostrar mensagens
+            const showMessage = (message, type) => {
+                userMessage.className = `alert alert-${type} mt-3`;
+                userMessage.textContent = message;
+                userMessage.style.display = 'block';
+                setTimeout(() => userMessage.style.display = 'none', 3000);
+            };
+
+            // Carregar usuários
+            async function loadUsers() {
+                try {
+                    const response = await fetch('/api/users', {
+                        headers: auth.getHeaders()
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Erro ao carregar usuários');
+                    }
+
+                    const users = await response.json();
+                    userTableBody.innerHTML = users.map(user => `
+                        <tr>
+                            <td>${user.id}</td>
+                            <td>${user.name}</td>
+                            <td>${user.matricula || '-'}</td>
+                            <td>${user.email}</td>
+                            <td>${user.birth_date ? new Date(user.birth_date).toLocaleDateString('pt-BR') : '-'}</td>
+                            <td>${user.phone || '-'}</td>
+                            <td>${user.role === 'admin' ? 'Administrador' : 'Usuário'}</td>
+                            <td>
+                                <button onclick="editUser(${user.id})" class="btn btn-warning btn-sm">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button onclick="resetPassword(${user.id})" class="btn btn-info btn-sm">
+                                    <i class="fas fa-key"></i>
+                                </button>
+                                <button onclick="deleteUser(${user.id})" class="btn btn-danger btn-sm">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `).join('');
+                } catch (error) {
+                    showMessage('Erro ao carregar usuários: ' + error.message, 'danger');
+                }
+            }
+
+            // Funções globais para edição e exclusão
+            window.editUser = async (id) => {
+                try {
+                    const response = await fetch(`/api/users/${id}`, {
+                        headers: auth.getHeaders()
+                    });
+                    
+                    if (!response.ok) throw new Error('Erro ao carregar dados do usuário');
+                    
+                    const user = await response.json();
+                    document.getElementById('userName').value = user.name;
+                    document.getElementById('userEmail').value = user.email;
+                    document.getElementById('userType').value = user.role;
+                    userForm.dataset.editId = id;
+                    document.querySelector('button[type="submit"]').textContent = 'Atualizar Usuário';
+                } catch (error) {
+                    showMessage(error.message, 'danger');
+                }
+            };
+
+            window.deleteUser = async (id) => {
+                if (!confirm('Tem certeza que deseja excluir este usuário?')) return;
+                
+                try {
+                    const response = await fetch(`/api/users/${id}`, {
+                        method: 'DELETE',
+                        headers: auth.getHeaders()
+                    });
+                    
+                    if (!response.ok) throw new Error('Erro ao excluir usuário');
+                    
+                    showMessage('Usuário excluído com sucesso', 'success');
+                    loadUsers();
+                } catch (error) {
+                    showMessage(error.message, 'danger');
+                }
+            };
+
+            window.resetPassword = async (id) => {
+                if (!confirm('Tem certeza que deseja redefinir a senha deste usuário para "12345"?')) return;
+                
+                try {
+                    const response = await fetch(`/api/users/${id}/reset-password`, {
+                        method: 'POST',
+                        headers: auth.getHeaders()
+                    });
+                    
+                    if (!response.ok) throw new Error('Erro ao redefinir senha');
+                    
+                    showMessage('Senha redefinida com sucesso para "12345"', 'success');
+                } catch (error) {
+                    showMessage(error.message, 'danger');
+                }
+            };
+
+            // Manipulador do formulário
+            userForm.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                
+                const formData = {
+                    name: document.getElementById('userName').value,
+                    email: document.getElementById('userEmail').value,
+                    type: document.getElementById('userType').value
+                };
+
+                try {
+                    const method = userForm.dataset.editId ? 'PUT' : 'POST';
+                    const url = userForm.dataset.editId ? 
+                        `/api/users/${userForm.dataset.editId}` : '/api/users';
+
+                    const response = await fetch(url, {
+                        method,
+                        headers: {
+                            ...auth.getHeaders(),
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(formData)
+                    });
+
+                    if (!response.ok) {
+                        const data = await response.json();
+                        throw new Error(data.message || 'Erro ao salvar usuário');
+                    }
+
+                    showMessage(
+                        `Usuário ${userForm.dataset.editId ? 'atualizado' : 'criado'} com sucesso`, 
+                        'success'
+                    );
+                    userForm.reset();
+                    delete userForm.dataset.editId;
+                    document.querySelector('button[type="submit"]').textContent = 'Adicionar Usuário';
+                    loadUsers();
+                } catch (error) {
+                    showMessage(error.message, 'danger');
+                }
+            });
+
+            // Botão voltar
+            document.getElementById('backButton').addEventListener('click', () => {
+                window.location.href = 'admin-panel.html';
+            });
+
+            // Modo noturno
             darkModeToggle.addEventListener('click', () => {
                 body.classList.toggle('dark-mode');
                 if (body.classList.contains('dark-mode')) {
@@ -162,11 +282,14 @@
                 }
             });
 
-            const darkModePreference = localStorage.getItem('darkMode');
-            if (darkModePreference === 'enabled') {
+            // Carregar preferência do modo noturno
+            if (localStorage.getItem('darkMode') === 'enabled') {
                 body.classList.add('dark-mode');
                 darkModeToggle.innerHTML = '<i class="fas fa-sun"></i>';
             }
+
+            // Carregar usuários inicialmente
+            loadUsers();
         });
     </script>
 </body>
