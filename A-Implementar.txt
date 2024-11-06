@@ -1,0 +1,1 @@
+Tela de Visualização do Perfil na main.html (Com as Informações completas do usuário e opção para alteração de dados e Senha)
