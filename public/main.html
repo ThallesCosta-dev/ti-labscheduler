@@ -87,16 +87,20 @@
                 return;
             }
 
-            // Decodifica o token para obter a role do usuário
             const token = localStorage.getItem('token');
             if (token) {
                 const payload = JSON.parse(atob(token.split('.')[1]));
                 userRole = payload.role;
                 
+                // Adiciona mensagem de boas-vindas
+                const firstName = payload.name.split(' ')[0];
+                const welcomeMessage = document.getElementById('welcomeMessage');
+                welcomeMessage.textContent = `Bem-vindo, ${firstName}!`;
+                
                 // Controla a visibilidade do botão admin
                 const adminButton = document.getElementById('adminPanelButton');
-                if (adminButton) {
-                    adminButton.style.display = userRole === 'admin' ? 'block' : 'none';
+                if (adminButton && userRole === 'admin') {
+                    adminButton.style.display = 'block';
                 }
             }
         });
@@ -108,16 +112,20 @@
         <div class="main-card fade-in">
             <i class="fas fa-laptop-code fa-3x mb-3"></i>
             <h2 class="main-title">TI LabScheduler</h2>
-            <p class="slogan mb-4">Maximizando o uso, facilitando o acesso!</p>
+            <p class="slogan mb-2">Maximizando o uso, facilitando o acesso!</p>
+            <p id="welcomeMessage" class="text-muted mb-4"></p>
 
             <div class="d-grid gap-2">
+                <button class="btn btn-info btn-main" onclick="window.location.href='profile.html'">
+                    <i class="fas fa-user-circle me-2"></i> Meu Perfil
+                </button>
                 <button class="btn btn-primary btn-main" onclick="window.location.href='select-lab.html'">
                     <i class="fas fa-calendar-plus me-2"></i> Agendar
                 </button>
                 <button class="btn btn-primary btn-main" onclick="window.location.href='consultar-agendamentos.html'">
                     <i class="fas fa-calendar-check me-2"></i> Consultar Agendamentos
                 </button>
-                <button id="adminPanelButton" class="btn btn-warning btn-main" onclick="window.location.href='admin-panel.html'" style="display: none;">
+                <button id="adminPanelButton" class="btn btn-warning btn-main" style="display: none;" onclick="window.location.href='admin-panel.html'">
                     <i class="fas fa-user-shield me-2"></i> Painel Administrativo
                 </button>
                 <button class="btn btn-danger btn-main" onclick="logout()">

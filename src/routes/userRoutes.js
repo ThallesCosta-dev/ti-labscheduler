@@ -25,11 +25,25 @@ router.get('/', auth, async (req, res) => {
 
 router.get('/:id', auth, async (req, res) => {
     try {
-        const user = await User.findById(req.params.id);
-        if (!user) {
+        const [rows] = await pool.execute(
+            'SELECT id, name, email, matricula, birth_date, phone, role FROM users WHERE id = ?',
+            [req.params.id]
+        );
+
+        if (rows.length === 0) {
             return res.status(404).json({ message: 'Usuário não encontrado' });
         }
-        res.json(user);
+
+        const user = rows[0];
+        res.json({
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            matricula: user.matricula,
+            birth_date: user.birth_date,
+            phone: user.phone,
+            role: user.role
+        });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -81,11 +95,17 @@ router.post('/:id/change-password', auth, async (req, res) => {
             return res.status(403).json({ message: 'Não autorizado' });
         }
 
-        // Buscar usuário
-        const user = await User.findById(userId);
-        if (!user) {
+        // Buscar usuário com senha
+        const [users] = await pool.execute(
+            'SELECT id, password FROM users WHERE id = ?',
+            [userId]
+        );
+
+        if (users.length === 0) {
             return res.status(404).json({ message: 'Usuário não encontrado' });
         }
+
+        const user = users[0];
 
         // Verificar senha atual
         const isValidPassword = await bcrypt.compare(currentPassword, user.password);
@@ -104,6 +124,7 @@ router.post('/:id/change-password', auth, async (req, res) => {
 
         res.json({ message: 'Senha alterada com sucesso' });
     } catch (error) {
+        console.error('Erro ao alterar senha:', error);
         res.status(500).json({ message: error.message });
     }
 });

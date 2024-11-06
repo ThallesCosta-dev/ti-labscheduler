@@ -6,19 +6,80 @@
     <title>TI LabScheduler - Perfil</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
-    <link href="style.css" rel="stylesheet">
+    <style>
+        body {
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .main-container {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .dark-mode .main-container {
+            background: linear-gradient(135deg, #2d3436 0%, #000000 100%);
+            color: #fff;
+        }
+
+        .profile-card {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            padding: 2rem;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .dark-mode .profile-card {
+            background: rgba(33, 37, 41, 0.9);
+            color: #fff;
+        }
+
+        .dark-mode .form-control {
+            background: rgba(33, 37, 41, 0.8);
+            border-color: #495057;
+            color: #fff;
+        }
+
+        .user-info p {
+            padding: 0.5rem;
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 5px;
+            margin-bottom: 0;
+        }
+
+        .dark-mode .user-info p {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
     <script src="/js/auth.js"></script>
 </head>
 <body>
-    <button id="darkModeToggle" class="btn btn-outline-secondary position-fixed top-0 end-0 m-3 transition-all">
+    <button id="darkModeToggle" class="btn btn-outline-secondary position-fixed top-0 end-0 m-3">
         <i class="fas fa-moon"></i>
     </button>
-    <button id="backButton" class="btn btn-outline-secondary position-fixed top-0 start-0 m-3 transition-all">
+    <button id="backButton" class="btn btn-outline-secondary position-fixed top-0 start-0 m-3">
         <i class="fas fa-arrow-left"></i> Voltar
     </button>
 
-    <div class="login-container d-flex align-items-center justify-content-center py-5">
-        <div class="login-card p-4 w-100" style="max-width: 500px;">
+    <div class="main-container">
+        <div class="profile-card fade-in">
             <h2 class="text-center mb-4">Meu Perfil</h2>
             
             <div class="user-info mb-4">
@@ -90,11 +151,18 @@
                 
                 const user = await response.json();
                 
-                document.getElementById('userName').textContent = user.name;
-                document.getElementById('userEmail').textContent = user.email;
+                // Formatação da data
+                const birthDate = user.birth_date ? new Date(user.birth_date) : null;
+                const formattedBirthDate = birthDate ? 
+                    birthDate.toLocaleDateString('pt-BR', {
+                        timeZone: 'UTC'  // Importante para evitar problemas de fuso horário
+                    }) : '-';
+                
+                // Atualização dos campos
+                document.getElementById('userName').textContent = user.name || '-';
+                document.getElementById('userEmail').textContent = user.email || '-';
                 document.getElementById('userMatricula').textContent = user.matricula || '-';
-                document.getElementById('userBirthDate').textContent = user.birth_date ? 
-                    new Date(user.birth_date).toLocaleDateString('pt-BR') : '-';
+                document.getElementById('userBirthDate').textContent = formattedBirthDate;
                 document.getElementById('userPhone').textContent = user.phone || '-';
                 document.getElementById('userType').textContent = user.role === 'admin' ? 
                     'Administrador' : 'Usuário';
