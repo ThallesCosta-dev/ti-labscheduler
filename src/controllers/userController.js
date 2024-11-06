@@ -8,6 +8,13 @@ const userController = {
         try {
             console.log('Dados recebidos:', req.body);
             const { name, email, password, matricula, birthDate, phone, type } = req.body;
+            
+            // Verificar se o email já existe
+            const existingUser = await User.findByEmail(email);
+            if (existingUser) {
+                return res.status(409).json({ message: 'Email já cadastrado' });
+            }
+
             const hashedPassword = await bcrypt.hash(password, 10);
             
             const [result] = await pool.execute(
@@ -19,9 +26,6 @@ const userController = {
             res.status(201).json({ message: 'Usuário registrado com sucesso' });
         } catch (error) {
             console.error('Erro no registro:', error);
-            if (error.code === 'ER_DUP_ENTRY') {
-                return res.status(400).json({ message: 'Email já cadastrado' });
-            }
             res.status(500).json({ message: error.message });
         }
     },
@@ -47,7 +51,11 @@ const userController = {
             }
 
             const token = jwt.sign(
-                { id: user.id, role: user.role },
+                { 
+                    id: user.id, 
+                    role: user.role,
+                    name: user.name
+                },
                 'sua_chave_secreta_aqui',
                 { expiresIn: '24h' }
             );
