@@ -540,11 +540,13 @@
 
                         const data = await response.json();
 
-                        if (response.ok) {
+                        if (response.status === 201) {
                             showMessage('Conta criada com sucesso! Redirecionando...', 'success');
                             setTimeout(() => {
                                 window.location.href = 'login.html';
                             }, 2000);
+                        } else if (response.status === 409) {
+                            showMessage('Este e-mail já está cadastrado. Por favor, use outro e-mail.', 'danger');
                         } else {
                             showMessage(data.message || 'Erro ao criar conta.', 'danger');
                         }

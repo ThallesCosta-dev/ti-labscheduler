@@ -79,18 +79,38 @@
 <body>
     <script src="/js/auth.js"></script>
     <script>
-        let userRole = null;
-
         document.addEventListener('DOMContentLoaded', async () => {
             if (!auth.isAuthenticated()) {
                 window.location.href = 'login.html';
                 return;
             }
 
+            // Configuração do modo escuro
+            const darkModeToggle = document.getElementById('darkModeToggle');
+            const body = document.body;
+
+            darkModeToggle.addEventListener('click', () => {
+                body.classList.toggle('dark-mode');
+                if (body.classList.contains('dark-mode')) {
+                    darkModeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+                    localStorage.setItem('darkMode', 'enabled');
+                } else {
+                    darkModeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+                    localStorage.setItem('darkMode', 'disabled');
+                }
+            });
+
+            const darkModePreference = localStorage.getItem('darkMode');
+            if (darkModePreference === 'enabled') {
+                body.classList.add('dark-mode');
+                darkModeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+            }
+
+            // Verificação de admin e configuração de boas-vindas
             const token = localStorage.getItem('token');
             if (token) {
                 const payload = JSON.parse(atob(token.split('.')[1]));
-                userRole = payload.role;
+                const userRole = payload.role;
                 
                 // Adiciona mensagem de boas-vindas
                 const firstName = payload.name.split(' ')[0];
@@ -104,6 +124,14 @@
                 }
             }
         });
+
+        const logout = () => {
+            if (typeof auth !== 'undefined') {
+                auth.logout();
+            } else {
+                window.location.href = 'login.html';
+            }
+        };
     </script>
     <button id="darkModeToggle" class="btn btn-outline-secondary position-fixed top-0 end-0 m-3 transition-all">
         <i class="fas fa-moon"></i>
@@ -134,37 +162,5 @@
             </div>
         </div>
     </div>
-
-    <script>
-        const logout = () => {
-            if (typeof auth !== 'undefined') {
-                auth.logout();
-            } else {
-                window.location.href = 'login.html';
-            }
-        };
-
-        document.addEventListener('DOMContentLoaded', () => {
-            const darkModeToggle = document.getElementById('darkModeToggle');
-            const body = document.body;
-
-            darkModeToggle.addEventListener('click', () => {
-                body.classList.toggle('dark-mode');
-                if (body.classList.contains('dark-mode')) {
-                    darkModeToggle.innerHTML = '<i class="fas fa-sun"></i>';
-                    localStorage.setItem('darkMode', 'enabled');
-                } else {
-                    darkModeToggle.innerHTML = '<i class="fas fa-moon"></i>';
-                    localStorage.setItem('darkMode', 'disabled');
-                }
-            });
-
-            const darkModePreference = localStorage.getItem('darkMode');
-            if (darkModePreference === 'enabled') {
-                body.classList.add('dark-mode');
-                darkModeToggle.innerHTML = '<i class="fas fa-sun"></i>';
-            }
-        });
-    </script>
 </body>
 </html>
