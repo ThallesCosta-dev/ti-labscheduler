@@ -14,9 +14,6 @@ class User {
             return result.insertId;
         } catch (error) {
             console.error('Erro ao criar usuário:', error);
-            if (error.code === 'ER_DUP_ENTRY') {
-                throw new Error('Email já cadastrado');
-            }
             throw error;
         }
     }

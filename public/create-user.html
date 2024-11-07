@@ -347,24 +347,21 @@
                     });
 
                     const data = await response.json();
+                    console.log('Response:', { status: response.status, data });
 
-                    if (response.ok) {
-                        createUserMessage.className = 'alert alert-success fade-in';
-                        createUserMessage.textContent = 'Conta criada com sucesso! Redirecionando...';
-                        createUserMessage.style.display = 'block';
-
+                    if (response.status === 201) {
+                        showMessage('Conta criada com sucesso! Redirecionando...', 'success');
                         setTimeout(() => {
                             window.location.href = 'login.html';
                         }, 2000);
+                    } else if (response.status === 409) {
+                        showMessage('Este e-mail já está cadastrado. Por favor, use outro e-mail.', 'danger');
                     } else {
-                        createUserMessage.className = 'alert alert-danger fade-in';
-                        createUserMessage.textContent = data.message || 'Erro ao criar conta.';
-                        createUserMessage.style.display = 'block';
+                        showMessage(data.message || 'Erro ao criar conta.', 'danger');
                     }
                 } catch (error) {
-                    createUserMessage.className = 'alert alert-danger fade-in';
-                    createUserMessage.textContent = 'Erro ao conectar com o servidor.';
-                    createUserMessage.style.display = 'block';
+                    console.error('Erro:', error);
+                    showMessage('Erro ao conectar com o servidor.', 'danger');
                 }
             }
         });
@@ -539,16 +536,15 @@
                         });
 
                         const data = await response.json();
+                        console.log('Response:', { status: response.status, data });
 
-                        if (response.status === 201) {
+                        if (data.success) {
                             showMessage('Conta criada com sucesso! Redirecionando...', 'success');
                             setTimeout(() => {
                                 window.location.href = 'login.html';
                             }, 2000);
-                        } else if (response.status === 409) {
-                            showMessage('Este e-mail já está cadastrado. Por favor, use outro e-mail.', 'danger');
                         } else {
-                            showMessage(data.message || 'Erro ao criar conta.', 'danger');
+                            showMessage(data.message, 'danger');
                         }
                     } catch (error) {
                         console.error('Erro:', error);

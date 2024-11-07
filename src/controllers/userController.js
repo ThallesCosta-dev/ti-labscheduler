@@ -6,27 +6,37 @@ const User = require('../models/User');
 const userController = {
     async register(req, res) {
         try {
-            console.log('Dados recebidos:', req.body);
             const { name, email, password, matricula, birthDate, phone, type } = req.body;
             
-            // Verificar se o email já existe
             const existingUser = await User.findByEmail(email);
             if (existingUser) {
-                return res.status(409).json({ message: 'Email já cadastrado' });
+                return res.status(409).json({ 
+                    success: false,
+                    message: 'Este e-mail já está cadastrado. Por favor, use outro e-mail.' 
+                });
             }
 
-            const hashedPassword = await bcrypt.hash(password, 10);
-            
-            const [result] = await pool.execute(
-                'INSERT INTO users (name, email, password, matricula, birth_date, phone, role) VALUES (?, ?, ?, ?, ?, ?, ?)',
-                [name, email, hashedPassword, matricula, birthDate, phone, type]
-            );
-            
-            console.log('Usuário criado com sucesso:', result);
-            res.status(201).json({ message: 'Usuário registrado com sucesso' });
+            const userId = await User.create({ 
+                name, email, password, matricula, birthDate, phone, type 
+            });
+
+            if (userId) {
+                return res.status(201).json({ 
+                    success: true,
+                    message: 'Usuário registrado com sucesso' 
+                });
+            } else {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Falha ao criar usuário'
+                });
+            }
         } catch (error) {
             console.error('Erro no registro:', error);
-            res.status(500).json({ message: error.message });
+            return res.status(500).json({ 
+                success: false,
+                message: error.message || 'Erro ao criar usuário. Tente novamente.' 
+            });
         }
     },
 
