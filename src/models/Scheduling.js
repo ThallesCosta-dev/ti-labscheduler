@@ -100,6 +100,46 @@ class Scheduling {
         );
         return result.affectedRows > 0;
     }
+
+    static async getCurrentSchedulings() {
+        const now = new Date();
+        const currentDate = now.toISOString().split('T')[0];
+        const currentTime = now.toTimeString().slice(0, 5);
+
+        const [rows] = await pool.execute(
+            `SELECT s.*, u.name as user_name 
+             FROM schedulings s 
+             JOIN users u ON s.user_id = u.id 
+             WHERE s.date = ? 
+             AND s.time_start <= ? 
+             AND s.time_end > ?
+             ORDER BY s.time_start ASC`,
+            [currentDate, currentTime, currentTime]
+        );
+        
+        return rows;
+    }
+
+    static async getComputersInUse(laboratory, date, timeStart, timeEnd) {
+        const [rows] = await pool.execute(
+            `SELECT computer_number 
+             FROM schedulings 
+             WHERE laboratory = ? 
+             AND date = ? 
+             AND ((time_start <= ? AND time_end > ?) 
+             OR (time_start < ? AND time_end >= ?))`,
+            [laboratory, date, timeEnd, timeStart, timeEnd, timeStart]
+        );
+
+        // Transformar a string de computadores em um array de números
+        const computersInUse = new Set();
+        rows.forEach(row => {
+            const computers = row.computer_number.split(',');
+            computers.forEach(comp => computersInUse.add(comp.trim()));
+        });
+
+        return Array.from(computersInUse);
+    }
 }
 
 module.exports = Scheduling; 

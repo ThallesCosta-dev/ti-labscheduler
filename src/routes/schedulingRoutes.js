@@ -63,4 +63,38 @@ router.delete('/:id', auth, async (req, res) => {
     }
 });
 
+// Rota para agendamentos em andamento
+router.get('/current', auth, async (req, res) => {
+    try {
+        const currentSchedulings = await Scheduling.getCurrentSchedulings();
+        res.json(currentSchedulings);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
+// Rota para verificar computadores em uso
+router.post('/computers-in-use', auth, async (req, res) => {
+    try {
+        const { laboratory, date, timeStart, timeEnd } = req.body;
+        
+        if (!laboratory || !date || !timeStart || !timeEnd) {
+            return res.status(400).json({ 
+                message: 'Todos os campos são obrigatórios' 
+            });
+        }
+
+        const computersInUse = await Scheduling.getComputersInUse(
+            laboratory, 
+            date, 
+            timeStart, 
+            timeEnd
+        );
+        
+        res.json(computersInUse);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
 module.exports = router; 

@@ -109,6 +109,20 @@
             from { opacity: 0; transform: translateY(-20px); }
             to { opacity: 1; transform: translateY(0); }
         }
+
+        .seat.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .seat.disabled i {
+            color: #dc3545;
+        }
+
+        .seat.disabled:hover {
+            transform: none;
+            background-color: transparent;
+        }
     </style>
 </head>
 <body>
@@ -324,6 +338,62 @@
             return;
         }
     });
+
+    async function checkComputersInUse() {
+        const laboratorio = document.getElementById('laboratorioSelect').value;
+        const data = document.getElementById('data').value;
+        const horaInicio = document.getElementById('horaInicio').value;
+        const horaFim = document.getElementById('horaFim').value;
+
+        if (!laboratorio || !data || !horaInicio || !horaFim) return;
+
+        try {
+            const response = await fetch('/api/schedulings/computers-in-use', {
+                method: 'POST',
+                headers: {
+                    ...auth.getHeaders(),
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    laboratory: laboratorio,
+                    date: data,
+                    timeStart: horaInicio,
+                    timeEnd: horaFim
+                })
+            });
+
+            if (!response.ok) throw new Error('Erro ao verificar computadores');
+            
+            const computersInUse = await response.json();
+            
+            // Atualizar visual dos computadores
+            document.querySelectorAll('.seat').forEach(seat => {
+                const computerId = seat.id;
+                if (computersInUse.includes(computerId)) {
+                    seat.classList.add('disabled');
+                    seat.disabled = true;
+                    seat.title = 'Computador em uso';
+                    // Se estiver selecionado, desselecionar
+                    if (seat.classList.contains('selected')) {
+                        seat.classList.remove('selected');
+                        updateSelectedSeats();
+                    }
+                } else {
+                    seat.classList.remove('disabled');
+                    seat.disabled = false;
+                    seat.title = '';
+                }
+            });
+        } catch (error) {
+            console.error('Erro:', error);
+            showMessage('Erro ao verificar disponibilidade dos computadores', 'danger');
+        }
+    }
+
+    // Adicione os event listeners para os campos de data e hora
+    document.getElementById('data').addEventListener('change', checkComputersInUse);
+    document.getElementById('horaInicio').addEventListener('change', checkComputersInUse);
+    document.getElementById('horaFim').addEventListener('change', checkComputersInUse);
 </script>
 
 </body>

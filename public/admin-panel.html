@@ -248,7 +248,7 @@
 
         async function loadAdminData() {
             try {
-                const response = await fetch('/api/schedulings/my', {
+                const response = await fetch('/api/schedulings/current', {
                     headers: auth.getHeaders()
                 });
 
@@ -265,11 +265,17 @@
                     agendamentosLista.innerHTML = schedulings.map(scheduling => `
                         <div class="card mb-2">
                             <div class="card-body">
-                                <h6>${scheduling.laboratory}</h6>
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <h6>${scheduling.laboratory}</h6>
+                                    <span class="badge bg-success">Em andamento</span>
+                                </div>
                                 <p class="mb-1">Data: ${formatDate(scheduling.date)}</p>
                                 <p class="mb-1">Horário: ${scheduling.time_start} - ${scheduling.time_end}</p>
-                                <p class="mb-0">Usuário: ${scheduling.user_name}</p>
-                                <p class="mb-0">Computadores: ${scheduling.computer_number}</p>
+                                <p class="mb-1">Usuário: ${scheduling.user_name}</p>
+                                <p class="mb-1">Computadores: ${scheduling.computer_number}</p>
+                                <p class="mb-1">Encarregado: ${scheduling.supervisor}</p>
+                                <p class="mb-1">Responsável: ${scheduling.responsible}</p>
+                                <p class="mb-0">Qtd. Alunos: ${scheduling.student_count}</p>
                             </div>
                         </div>
                     `).join('');
