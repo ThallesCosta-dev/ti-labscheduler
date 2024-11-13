@@ -29,8 +29,13 @@ app.use('/api/users', userRoutes);
 app.use('/api/schedulings', schedulingRoutes);
 
 // Rota para servir arquivos estáticos
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, '../public/login.html'));
+});
+
+// Rota para outros arquivos estáticos
 app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '../public/index.html'));
+    res.sendFile(path.join(__dirname, '../public/login.html'));
 });
 
 // Middleware de erro

@@ -381,16 +381,20 @@
                 validate: (value) => {
                     const regex = /^\d{5,20}$/;
                     if (!value) return 'A matrícula é obrigatória.';
-                    if (!regex.test(value)) return 'A matrícula deve conter apenas números, entre 5 e 20 dígitos.';
+                    if (!regex.test(value)) return 'A matrícula deve conter apenas números, entre 5 e 20 d��gitos.';
                     return null;
                 }
             },
             email: {
-                validate: (value) => {
+                validate: async (value) => {
                     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
                     if (!value) return 'O e-mail é obrigatório.';
                     if (!regex.test(value)) return 'Por favor, insira um e-mail válido.';
                     if (!value.includes('.edu.br')) return 'Por favor, utilize um e-mail institucional (.edu.br)';
+                    
+                    const isAvailable = await checkEmailAvailability(value);
+                    if (!isAvailable) return 'Este e-mail já está cadastrado.';
+                    
                     return null;
                 }
             },
@@ -476,6 +480,40 @@
                 }
             }
             return true;
+        }
+
+        async function checkEmailAvailability(email) {
+            try {
+                const response = await fetch(`/api/users/check-email?email=${encodeURIComponent(email)}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+                const emailInput = document.getElementById('email');
+                const feedbackDiv = emailInput.nextElementSibling;
+
+                if (!response.ok) {
+                    emailInput.classList.add('is-invalid');
+                    feedbackDiv.textContent = data.message || 'Erro ao verificar e-mail';
+                    return false;
+                }
+
+                if (data.exists) {
+                    emailInput.classList.add('is-invalid');
+                    feedbackDiv.textContent = 'Este e-mail já está cadastrado';
+                    return false;
+                }
+
+                emailInput.classList.remove('is-invalid');
+                emailInput.classList.add('is-valid');
+                return true;
+            } catch (error) {
+                console.error('Erro:', error);
+                return false;
+            }
         }
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -565,6 +603,11 @@
                 input.addEventListener('focus', () => {
                     document.getElementById('createUserMessage').style.display = 'none';
                 });
+            });
+
+            // Adicione um event listener para o campo de email
+            document.getElementById('email').addEventListener('blur', async function() {
+                await validateField('email');
             });
         });
     </script>

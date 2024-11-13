@@ -129,4 +129,19 @@ router.post('/:id/change-password', auth, async (req, res) => {
     }
 });
 
+// Rota para verificar disponibilidade de email
+router.get('/check-email', async (req, res) => {
+    try {
+        const { email } = req.query;
+        if (!email) {
+            return res.status(400).json({ message: 'E-mail é obrigatório' });
+        }
+
+        const user = await User.findByEmail(email);
+        res.json({ exists: !!user });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
 module.exports = router; 
