@@ -27,6 +27,7 @@ O TI LabScheduler é um aplicativo web desenvolvido para gerenciar agendamentos 
    cd ti-labscheduler
    ```
 3. Instale as dependências do backend:
+   Instale o Node.js
    ```bash
    npm install
    npm install express cors dotenv mysql2 jsonwebtoken bcrypt path
