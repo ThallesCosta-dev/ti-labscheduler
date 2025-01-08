@@ -11,18 +11,29 @@ const pool = mysql.createPool({
     connectionLimit: 10,
     queueLimit: 0,
     ssl: {
-        rejectUnauthorized: false // necessário para conexões remotas na Hostinger
-    }
+        rejectUnauthorized: false,
+        enableTrace: true
+    },
+    connectTimeout: 60000
 });
 
-// Testar conexão
+// Log detalhado da tentativa de conexão
 pool.getConnection()
     .then(connection => {
-        console.log('Banco de dados conectado com sucesso!');
+        console.log('Conexão bem sucedida!');
+        console.log('Conectado como:', process.env.DB_USER);
+        console.log('Banco de dados:', process.env.DB_NAME);
         connection.release();
     })
     .catch(err => {
-        console.error('Erro ao conectar ao banco de dados:', err.message);
+        console.error('Detalhes do erro de conexão:', {
+            message: err.message,
+            code: err.code,
+            errno: err.errno,
+            sqlState: err.sqlState,
+            host: process.env.DB_HOST,
+            user: process.env.DB_USER
+        });
     });
 
 module.exports = pool;
